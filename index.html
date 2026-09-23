@@ -1,158 +1,1468 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b0d12">
-<title>The NorthApp</title>
-<style>
-:root{
-  --bg:#f4f5f7;--surface:#fff;--surface2:#eef0f3;--text:#111318;--muted:#707680;
-  --line:#e1e3e7;--accent:#111318;--accentText:#fff;--blue:#087df0;
-  --radius:22px;--shadow:0 16px 50px rgba(0,0,0,.08);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
-}
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text)}
-button,input{font:inherit}
-button{border:0;cursor:pointer}
-.app{height:100dvh;display:grid;grid-template-columns:300px 1fr;overflow:hidden}
-.sidebar{background:#0b0d12;color:#fff;padding:24px 16px;display:flex;flex-direction:column;gap:20px}
-.brand{font-size:25px;font-weight:800;letter-spacing:-1px;padding:5px 10px 15px}
-.brand span{font-weight:400}
-.search{height:44px;border-radius:14px;background:#1a1d24;color:#fff;border:1px solid #282c34;padding:0 14px;outline:0;width:100%}
-.search::placeholder{color:#9297a1}
-.nav{display:grid;gap:6px}
-.nav button{height:48px;border-radius:13px;background:transparent;color:#aeb3bd;text-align:left;padding:0 13px;font-weight:600}
-.nav button.active,.nav button:hover{background:#20232a;color:#fff}
-.section-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#777d87;padding:10px 10px 4px}
-.chat-list{display:grid;gap:4px;overflow:auto}
-.chat{display:grid;grid-template-columns:43px 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:14px;color:#fff;background:transparent;text-align:left}
-.chat:hover,.chat.active{background:#20232a}
-.avatar{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:#d8dbe1;color:#111;font-weight:700}
-.chat-main{min-width:0}.chat-name{font-weight:700;font-size:14px}.chat-last{font-size:12px;color:#8f95a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
-.chat-time{font-size:10px;color:#7e848e}
-.profile{margin-top:auto;border-top:1px solid #242830;padding-top:16px;display:flex;align-items:center;gap:10px}
-.profile .avatar{background:#fff}
-.profile-info{min-width:0}.profile-name{font-weight:700}.profile-status{font-size:12px;color:#9297a1}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TheMessages - Communication Modern</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            imessage: {
+              blue: '#007AFF',
+              green: '#34C759',
+              grayBg: '#F2F2F7',
+              darkBg: '#1C1C1E',
+              bubbleGray: '#E9E9EB',
+              bubbleDarkGray: '#2C2C2E',
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
 
-.main{min-width:0;background:var(--surface);display:grid;grid-template-rows:76px 1fr auto}
-.topbar{border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px}
-.contact{display:flex;align-items:center;gap:12px}.contact .avatar{width:44px;height:44px}
-.contact-name{font-weight:800;font-size:17px}.contact-state{font-size:12px;color:#7b818b;margin-top:2px}
-.actions{display:flex;gap:8px}.action{width:42px;height:42px;border-radius:13px;background:var(--surface2);color:var(--text);font-size:17px}.action:hover{background:#e4e6ea}
-.messages{overflow:auto;padding:28px clamp(18px,5vw,70px);display:flex;flex-direction:column;gap:9px}
-.day{text-align:center;color:#8a9099;font-size:11px;margin:4px 0 12px}
-.row{display:flex}.row.me{justify-content:flex-end}.bubble{max-width:min(68%,620px);padding:12px 16px;border-radius:19px;background:#eef0f3;line-height:1.38;font-size:15px}.me .bubble{background:#111318;color:#fff}.meta{font-size:10px;color:#90959d;margin:4px 9px}.me .meta{text-align:right}
-.composer{padding:13px 24px 18px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:end}
-.add{width:45px;height:45px;border-radius:14px;background:var(--surface2);font-size:25px}
-.input-wrap{flex:1;display:flex;align-items:end;border:1px solid var(--line);border-radius:17px;padding:5px 6px 5px 14px;background:#fff}
-#input{flex:1;border:0;outline:0;resize:none;min-height:34px;max-height:120px;padding:7px 0;font-size:15px}
-.send{width:38px;height:38px;border-radius:12px;background:var(--blue);color:#fff;font-size:17px}
-.send:disabled{opacity:.35;cursor:default}
+  <!-- React & ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-.empty{display:none}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:#111318;color:#fff;padding:10px 15px;border-radius:13px;font-size:13px;opacity:0;pointer-events:none;transition:.2s}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-@media(max-width:800px){
-  .app{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .topbar{padding:0 15px}
-  .messages{padding:20px 14px}
-  .bubble{max-width:82%}
-  .composer{padding:10px 12px max(12px,env(safe-area-inset-bottom))}
-}
-</style>
+  <style>
+    /* Custom Scrollbars & iOS Animations */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4);
+      border-radius: 9999px;
+    }
+    .glass-effect {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .bubble-tail-user {
+      clip-path: polygon(0 0, 100% 0, 100% 80%, 85% 100%, 85% 80%, 0 80%);
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+  </style>
 </head>
-<body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="brand">The <span>North</span>App</div>
-    <input class="search" id="search" placeholder="Rechercher">
-    <div class="nav">
-      <button class="active" data-view="messages">Messages</button>
-      <button data-view="groups">Groupes</button>
-      <button data-view="contacts">Contacts</button>
-    </div>
-    <div class="section-title">Conversations</div>
-    <div class="chat-list" id="chatList">
-      <button class="chat active" data-name="Alex Morgan" data-status="En ligne">
-        <span class="avatar">AM</span><span class="chat-main"><span class="chat-name">Alex Morgan</span><span class="chat-last">On se retrouve ce soir ?</span></span><span class="chat-time">11:42</span>
-      </button>
-      <button class="chat" data-name="North Team" data-status="8 membres">
-        <span class="avatar">N</span><span class="chat-main"><span class="chat-name">North Team</span><span class="chat-last">Camille : nouveau document</span></span><span class="chat-time">10:18</span>
-      </button>
-      <button class="chat" data-name="Emma" data-status="Hors ligne">
-        <span class="avatar">E</span><span class="chat-main"><span class="chat-name">Emma</span><span class="chat-last">Merci !</span></span><span class="chat-time">Hier</span>
-      </button>
-    </div>
-    <div class="profile">
-      <span class="avatar">M</span><span class="profile-info"><span class="profile-name">Mon profil</span><span class="profile-status">Disponible</span></span>
-    </div>
-  </aside>
+<body class="h-full bg-imessage-grayBg dark:bg-black text-gray-900 dark:text-gray-100 font-sans antialiased select-none overflow-hidden">
 
-  <main class="main">
-    <header class="topbar">
-      <div class="contact">
-        <span class="avatar" id="contactAvatar">AM</span>
-        <div><div class="contact-name" id="contactName">Alex Morgan</div><div class="contact-state" id="contactState">En ligne</div></div>
-      </div>
-      <div class="actions">
-        <button class="action" id="call" title="Appel">⌕</button>
-        <button class="action" id="video" title="Vidéo">▣</button>
-        <button class="action" id="more" title="Plus">•••</button>
-      </div>
-    </header>
+  <div id="root" class="h-full"></div>
 
-    <section class="messages" id="messages">
-      <div class="day">Aujourd’hui</div>
-      <div class="row"><div><div class="bubble">Salut ! Tu as reçu le nouveau dossier ?</div><div class="meta">11:38</div></div></div>
-      <div class="row me"><div><div class="bubble">Oui, je viens de le regarder.</div><div class="meta">11:40 · Distribué</div></div></div>
-      <div class="row"><div><div class="bubble">Parfait. On se retrouve ce soir ?</div><div class="meta">11:42</div></div></div>
-    </section>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
 
-    <form class="composer" id="composer">
-      <button class="add" type="button" id="add">+</button>
-      <div class="input-wrap">
-        <textarea id="input" rows="1" placeholder="Écrire un message…"></textarea>
-        <button class="send" id="send" type="submit" disabled>↑</button>
-      </div>
-    </form>
-  </main>
-</div>
-<div class="toast" id="toast"></div>
+    // --- Mock Initial Database ---
+    const INITIAL_PRESET_CONTACTS = [
+      { id: 'c1', name: 'Claudette', phone: '+33 6 12 34 56 78', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', status: 'En ligne', persona: 'Claudette, une amie chaleureuse et attentionnée qui adore parler de jardinage et de recettes.' },
+      { id: 'c2', name: 'Bernard', phone: '+33 6 98 76 54 32', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', status: 'Occupé', persona: 'Bernard, un ami passionné d histoire et de bricolage avec un grand sens de l humour.' },
+      { id: 'c3', name: 'Sophie L.', phone: '+33 6 45 89 23 11', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', status: 'À la gym 🏋️‍♀️', persona: 'Sophie, toujours dynamique et sportive, adepte des bons plans et des sorties.' },
+      { id: 'c4', name: 'Thomas Tech', phone: '+33 6 77 88 99 00', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', status: 'En réunion', persona: 'Thomas, un passionné d informatique et de nouvelles technologies.' },
+    ];
 
-<script>
-const input=document.getElementById('input'), send=document.getElementById('send'), messages=document.getElementById('messages');
-const toast=document.getElementById('toast');
+    // Main App Component
+    function App() {
+      const [currentUser, setCurrentUser] = useState(null);
+      const [permissionGranted, setPermissionGranted] = useState(false);
+      const [showPermissionModal, setShowPermissionModal] = useState(false);
+      
+      const [contacts, setContacts] = useState([]);
+      const [conversations, setConversations] = useState([]);
+      const [activeChatId, setActiveChatId] = useState(null);
+      
+      const [searchQuery, setSearchQuery] = useState('');
+      const [filterTab, setFilterTab] = useState('all'); // 'all', 'unread', 'pinned'
+      const [activeTab, setActiveTab] = useState('chats'); // 'chats', 'status', 'contacts', 'settings'
+      
+      const [darkMode, setDarkMode] = useState(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      const [activeCall, setActiveCall] = useState(null); // { type: 'audio'|'video', contact: obj }
+      const [stories, setStories] = useState([]);
+      const [activeStory, setActiveStory] = useState(null);
 
-function resize(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,120)+'px';send.disabled=!input.value.trim();}
-input.addEventListener('input',resize);
-input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('composer').requestSubmit();}});
-document.getElementById('composer').addEventListener('submit',e=>{
-  e.preventDefault(); const text=input.value.trim(); if(!text)return;
-  const row=document.createElement('div'); row.className='row me';
-  row.innerHTML='<div><div class="bubble"></div><div class="meta">À l’instant · Distribué</div></div>';
-  row.querySelector('.bubble').textContent=text; messages.appendChild(row);
-  input.value='';resize();messages.scrollTop=messages.scrollHeight;
-});
-document.querySelectorAll('.chat').forEach(chat=>chat.addEventListener('click',()=>{
-  document.querySelectorAll('.chat').forEach(c=>c.classList.remove('active'));chat.classList.add('active');
-  document.getElementById('contactName').textContent=chat.dataset.name;
-  document.getElementById('contactState').textContent=chat.dataset.status;
-  document.getElementById('contactAvatar').textContent=chat.dataset.name.split(' ').map(x=>x[0]).join('').slice(0,2);
-}));
-document.getElementById('search').addEventListener('input',e=>{
-  const q=e.target.value.toLowerCase();
-  document.querySelectorAll('.chat').forEach(c=>c.style.display=c.innerText.toLowerCase().includes(q)?'grid':'none');
-});
-function notice(t){toast.textContent=t;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1800)}
-document.getElementById('add').onclick=()=>notice('Pièces jointes — prochaine version');
-document.getElementById('call').onclick=()=>notice('Appel audio — prochaine version');
-document.getElementById('video').onclick=()=>notice('Appel vidéo — prochaine version');
-document.getElementById('more').onclick=()=>notice('Options de conversation');
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');notice(b.textContent+' — bêta 1')});
-</script>
+      // System notification banner
+      const [toast, setToast] = useState(null);
+
+      const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3500);
+      };
+
+      // Toggle Dark Mode
+      useEffect(() => {
+        if (darkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }, [darkMode]);
+
+      const handleLogin = (user, isNewUser = false) => {
+        setCurrentUser(user);
+        if (isNewUser) {
+          // Rule: If new user account, NO contacts like Claudette or Bernard by default!
+          setContacts([]);
+          setConversations([]);
+          setShowPermissionModal(true);
+          showToast(`Bienvenue ${user.name} ! Votre compte a été créé avec succès.`, 'success');
+        } else {
+          // Existing session demo
+          setContacts(INITIAL_PRESET_CONTACTS);
+          setPermissionGranted(true);
+          setConversations([
+            {
+              id: 'conv_c1',
+              contactId: 'c1',
+              pinned: true,
+              unread: 1,
+              pinnedMessage: 'Rendez-vous à 15h demain au salon du thé !',
+              messages: [
+                { id: 'm1', sender: 'c1', text: 'Coucou ! Comment vas-tu aujourd’hui ?', timestamp: '10:14', status: 'read' },
+                { id: 'm2', sender: 'user', text: 'Très bien et toi Claudette ?', timestamp: '10:15', status: 'read' },
+                { id: 'm3', sender: 'c1', text: 'Rendez-vous à 15h demain au salon du thé !', timestamp: '10:16', status: 'read', pinned: true }
+              ]
+            },
+            {
+              id: 'conv_c2',
+              contactId: 'c2',
+              pinned: false,
+              unread: 0,
+              pinnedMessage: null,
+              messages: [
+                { id: 'm4', sender: 'c2', text: 'Tu as vu le dernier match hier soir ?', timestamp: 'Hier', status: 'read' }
+              ]
+            }
+          ]);
+          setActiveChatId('conv_c1');
+          showToast(`Bon retour, ${user.name} !`, 'info');
+        }
+      };
+
+      const handleLogout = () => {
+        setCurrentUser(null);
+        setContacts([]);
+        setConversations([]);
+        setActiveChatId(null);
+        setPermissionGranted(false);
+        showToast('Vous avez été déconnecté.', 'info');
+      };
+
+      const handleGrantContactsPermission = () => {
+        setPermissionGranted(true);
+        setShowPermissionModal(false);
+        
+        // Import contacts from phone address book
+        setContacts(INITIAL_PRESET_CONTACTS);
+        
+        // Initialize sample welcome conversation
+        const newConvs = INITIAL_PRESET_CONTACTS.map((c, idx) => ({
+          id: `conv_${c.id}`,
+          contactId: c.id,
+          pinned: idx === 0,
+          unread: idx === 0 ? 1 : 0,
+          pinnedMessage: null,
+          messages: [
+            {
+              id: `init_${c.id}`,
+              sender: c.id,
+              text: `Bonjour ! Je suis ${c.name} sur TheMessages. On se parle bientôt ! 😊`,
+              timestamp: 'A l’instant',
+              status: 'delivered'
+            }
+          ]
+        }));
+        setConversations(newConvs);
+        setActiveChatId(newConvs[0]?.id || null);
+
+        showToast('Synchronisation réussie ! 4 contacts ajoutés à TheMessages.', 'success');
+      };
+
+      const handleDenyContactsPermission = () => {
+        setPermissionGranted(false);
+        setShowPermissionModal(false);
+        setContacts([]);
+        showToast('Permission refusée. Vous pouvez ajouter des contacts manuellement.', 'warning');
+      };
+
+      // Add single contact manually
+      const handleAddManualContact = (name, phone) => {
+        if (!name || !phone) return;
+        const newContact = {
+          id: 'c_' + Date.now(),
+          name,
+          phone,
+          avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`,
+          status: 'Nouveau contact',
+          persona: `${name} est un contact ajouté manuellement.`
+        };
+        setContacts(prev => [...prev, newContact]);
+        
+        // Create empty conversation
+        const newConv = {
+          id: `conv_${newContact.id}`,
+          contactId: newContact.id,
+          pinned: false,
+          unread: 0,
+          pinnedMessage: null,
+          messages: []
+        };
+        setConversations(prev => [newConv, ...prev]);
+        setActiveChatId(newConv.id);
+        showToast(`Contact "${name}" ajouté avec succès !`, 'success');
+      };
+
+      const triggerContactResponse = async (convId, userText) => {
+        const conv = conversations.find(c => c.id === convId);
+        if (!conv) return;
+        const contact = contacts.find(c => c.id === conv.contactId);
+        if (!contact) return;
+
+        // Show typing indicator in UI
+        setConversations(prev => prev.map(c => c.id === convId ? { ...c, isTyping: true } : c));
+
+        try {
+          const apiKey = ""; // Canvas runtime environment automatically passes key
+          const systemPrompt = `Tu es ${contact.name}. ${contact.persona} Réponds comme si tu étais un ami réel envoyant un SMS ou un message WhatsApp court, naturel et chaleureux en français (1 à 3 phrases max). Utilise des emojis occasionnellement. Ne sors jamais du rôle.`;
+          
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: userText }] }],
+              systemInstruction: { parts: [{ text: systemPrompt }] }
+            })
+          });
+
+          const data = await response.json();
+          const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "J'ai bien reçu ton message ! 😊";
+
+          setTimeout(() => {
+            const replyMsg = {
+              id: 'm_' + Date.now(),
+              sender: contact.id,
+              text: replyText,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              status: 'read'
+            };
+
+            setConversations(prev => prev.map(c => {
+              if (c.id === convId) {
+                return {
+                  ...c,
+                  isTyping: false,
+                  messages: [...c.messages, replyMsg]
+                };
+              }
+              return c;
+            }));
+          }, 1500);
+
+        } catch (err) {
+          console.error('Gemini auto reply error:', err);
+          setTimeout(() => {
+            const fallbackMsg = {
+              id: 'm_' + Date.now(),
+              sender: contact.id,
+              text: "Super ! Merci pour ton message 👍",
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              status: 'read'
+            };
+            setConversations(prev => prev.map(c => c.id === convId ? { ...c, isTyping: false, messages: [...c.messages, fallbackMsg] } : c));
+          }, 1200);
+        }
+      };
+
+      const handleSendMessage = (convId, text, type = 'text', mediaUrl = null) => {
+        if (!text && !mediaUrl) return;
+
+        const newMsg = {
+          id: 'm_' + Date.now(),
+          sender: 'user',
+          text,
+          type,
+          mediaUrl,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          status: 'sent'
+        };
+
+        setConversations(prev => prev.map(c => {
+          if (c.id === convId) {
+            return {
+              ...c,
+              messages: [...c.messages, newMsg]
+            };
+          }
+          return c;
+        }));
+
+        // Trigger AI reply if sending text or voice
+        triggerContactResponse(convId, text || "Photo partagée");
+      };
+
+      const handleTogglePinChat = (convId, e) => {
+        if (e) e.stopPropagation();
+        setConversations(prev => prev.map(c => {
+          if (c.id === convId) {
+            const updated = !c.pinned;
+            showToast(updated ? 'Discussion épinglée' : 'Discussion désépinglée', 'info');
+            return { ...c, pinned: updated };
+          }
+          return c;
+        }));
+      };
+
+      const handlePinMessage = (convId, msg) => {
+        setConversations(prev => prev.map(c => {
+          if (c.id === convId) {
+            const isAlreadyPinned = c.pinnedMessage === msg.text;
+            showToast(isAlreadyPinned ? 'Message désépinglé' : 'Message épinglé en haut de l’écran', 'info');
+            return {
+              ...c,
+              pinnedMessage: isAlreadyPinned ? null : msg.text,
+              messages: c.messages.map(m => m.id === msg.id ? { ...m, pinned: !isAlreadyPinned } : m)
+            };
+          }
+          return c;
+        }));
+      };
+
+      const activeConv = conversations.find(c => c.id === activeChatId);
+      const activeContact = contacts.find(c => c.id === activeConv?.contactId);
+
+      // Filter conversations
+      const filteredConversations = conversations.filter(conv => {
+        const contact = contacts.find(c => c.id === conv.contactId);
+        const nameMatch = contact ? contact.name.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+        const msgMatch = conv.messages.some(m => m.text?.toLowerCase().includes(searchQuery.toLowerCase()));
+        
+        if (!nameMatch && !msgMatch && searchQuery.trim() !== '') return false;
+
+        if (filterTab === 'unread') return conv.unread > 0;
+        if (filterTab === 'pinned') return conv.pinned;
+        return true;
+      }).sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+      if (!currentUser) {
+        return <AuthScreen onLogin={handleLogin} darkMode={darkMode} setDarkMode={setDarkMode} />;
+      }
+
+      return (
+        <div className="flex h-screen w-full overflow-hidden bg-imessage-grayBg dark:bg-black">
+          {/* Toast Banner */}
+          {toast && (
+            <div className={`fixed top-4 right-1/2 translate-x-1/2 z-50 px-4 py-2.5 rounded-full shadow-2xl flex items-center space-x-2 text-sm font-medium transition-all duration-300 ${
+              toast.type === 'success' ? 'bg-emerald-600 text-white' :
+              toast.type === 'warning' ? 'bg-amber-600 text-white' :
+              'bg-blue-600 text-white'
+            }`}>
+              <i className={`fa-solid ${toast.type === 'success' ? 'fa-check-circle' : toast.type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}`}></i>
+              <span>{toast.message}</span>
+            </div>
+          )}
+
+          {/* Contact Permission Modal */}
+          {showPermissionModal && (
+            <PermissionModal 
+              onAccept={handleGrantContactsPermission}
+              onDeny={handleDenyContactsPermission}
+            />
+          )}
+
+          {/* Video / Audio Call Overlay */}
+          {activeCall && (
+            <CallOverlay 
+              call={activeCall} 
+              onEndCall={() => setActiveCall(null)} 
+            />
+          )}
+
+          {/* Left Navigation Sidebar */}
+          <div className="w-20 md:w-24 bg-white/70 dark:bg-imessage-darkBg/70 border-r border-gray-200 dark:border-gray-800 flex flex-col items-center py-6 justify-between glass-effect z-10">
+            <div className="flex flex-col items-center space-y-8 w-full">
+              {/* App Logo */}
+              <div className="relative group cursor-pointer">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                  <i className="fa-solid fa-comment-dots text-xl"></i>
+                </div>
+              </div>
+
+              {/* Nav Items */}
+              <nav className="flex flex-col space-y-6 w-full px-3">
+                <button 
+                  onClick={() => setActiveTab('chats')} 
+                  className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${
+                    activeTab === 'chats' 
+                      ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold' 
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                  }`}
+                  title="Discussions"
+                >
+                  <i className="fa-solid fa-[#007AFF] fa-message text-xl"></i>
+                  <span className="text-[10px] mt-1">Chat</span>
+                </button>
+
+                <button 
+                  onClick={() => setActiveTab('status')} 
+                  className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${
+                    activeTab === 'status' 
+                      ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold' 
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                  }`}
+                  title="Statuts WhatsApp"
+                >
+                  <i className="fa-solid fa-circle-notch text-xl"></i>
+                  <span className="text-[10px] mt-1">Statuts</span>
+                </button>
+
+                <button 
+                  onClick={() => setActiveTab('contacts')} 
+                  className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${
+                    activeTab === 'contacts' 
+                      ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold' 
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                  }`}
+                  title="Carnet de contacts"
+                >
+                  <i className="fa-solid fa-address-book text-xl"></i>
+                  <span className="text-[10px] mt-1">Contacts</span>
+                </button>
+
+                <button 
+                  onClick={() => setActiveTab('settings')} 
+                  className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${
+                    activeTab === 'settings' 
+                      ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold' 
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                  }`}
+                  title="Réglages"
+                >
+                  <i className="fa-solid fa-gear text-xl"></i>
+                  <span className="text-[10px] mt-1">Réglages</span>
+                </button>
+              </nav>
+            </div>
+
+            {/* Profile Avatar & Theme toggle */}
+            <div className="flex flex-col items-center space-y-4">
+              <button 
+                onClick={() => setDarkMode(!darkMode)}
+                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+                title="Changer de thème"
+              >
+                <i className={`fa-solid ${darkMode ? 'fa-sun text-amber-400' : 'fa-moon'}`}></i>
+              </button>
+
+              <div className="relative group">
+                <img 
+                  src={currentUser.avatar} 
+                  alt={currentUser.name} 
+                  className="w-10 h-10 rounded-full object-cover border-2 border-blue-500 shadow"
+                />
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-black rounded-full"></div>
+              </div>
+            </div>
+          </div>
+
+          {}
+          {activeTab === 'chats' && (
+            <div className="flex flex-1 h-full overflow-hidden">
+              {/* Chat List Sidebar */}
+              <div className={`w-full md:w-80 lg:w-96 bg-white dark:bg-imessage-darkBg border-r border-gray-200 dark:border-gray-800 flex flex-col h-full ${activeChatId ? 'hidden md:flex' : 'flex'}`}>
+                {/* Header */}
+                <div className="p-4 border-b border-gray-100 dark:border-gray-800/60 flex flex-col space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold tracking-tight">Messages</h1>
+                    <button 
+                      onClick={() => setActiveTab('contacts')}
+                      className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:bg-blue-100 transition"
+                      title="Nouveau message"
+                    >
+                      <i className="fa-solid fa-pen-to-square"></i>
+                    </button>
+                  </div>
+
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input 
+                      type="text"
+                      placeholder="Rechercher..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-4 py-1.5 text-sm rounded-xl bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500 outline-none placeholder-gray-400 dark:placeholder-gray-500"
+                    />
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div className="flex space-x-2 pt-1 text-xs">
+                    <button 
+                      onClick={() => setFilterTab('all')}
+                      className={`px-3 py-1 rounded-full font-medium transition ${filterTab === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}
+                    >
+                      Toutes
+                    </button>
+                    <button 
+                      onClick={() => setFilterTab('unread')}
+                      className={`px-3 py-1 rounded-full font-medium transition ${filterTab === 'unread' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}
+                    >
+                      Non lues
+                    </button>
+                    <button 
+                      onClick={() => setFilterTab('pinned')}
+                      className={`px-3 py-1 rounded-full font-medium transition flex items-center space-x-1 ${filterTab === 'pinned' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}
+                    >
+                      {/* Using custom pin icon styled as in uploaded image */}
+                      <i className="fa-solid fa-thumbtack text-[10px] transform rotate-45"></i>
+                      <span>Épinglées</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Discussions List */}
+                <div className="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800/40">
+                  {!permissionGranted && (
+                    <div className="p-4 m-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl flex flex-col space-y-2">
+                      <div className="flex items-center space-x-2 text-amber-700 dark:text-amber-400 font-semibold text-xs">
+                        <i className="fa-solid fa-shield-halved"></i>
+                        <span>Permission Contacts requise</span>
+                      </div>
+                      <p className="text-xs text-amber-600 dark:text-amber-300">
+                        Synchronisez vos contacts pour démarrer une discussion avec vos proches.
+                      </p>
+                      <button 
+                        onClick={() => setShowPermissionModal(true)}
+                        className="mt-1 px-3 py-1.5 bg-amber-600 text-white text-xs font-semibold rounded-xl hover:bg-amber-700 transition"
+                      >
+                        Autoriser l'accès aux contacts
+                      </button>
+                    </div>
+                  )}
+
+                  {filteredConversations.length === 0 ? (
+                    <div className="p-8 text-center text-gray-400 text-sm flex flex-col items-center justify-center h-48 space-y-2">
+                      <i className="fa-regular fa-comments text-3xl opacity-40"></i>
+                      <p>Aucune conversation trouvée.</p>
+                      {permissionGranted && (
+                        <button 
+                          onClick={() => setActiveTab('contacts')} 
+                          className="text-xs text-blue-500 hover:underline mt-1 font-medium"
+                        >
+                          Démarrer une nouvelle discussion
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    filteredConversations.map(conv => {
+                      const contact = contacts.find(c => c.id === conv.contactId);
+                      if (!contact) return null;
+                      const lastMsg = conv.messages[conv.messages.length - 1];
+                      const isActive = conv.id === activeChatId;
+
+                      return (
+                        <div 
+                          key={conv.id}
+                          onClick={() => {
+                            setActiveChatId(conv.id);
+                            // Clear unread badge
+                            setConversations(prev => prev.map(c => c.id === conv.id ? { ...c, unread: 0 } : c));
+                          }}
+                          className={`p-3.5 flex items-center space-x-3 cursor-pointer transition group relative ${
+                            isActive 
+                              ? 'bg-blue-50/80 dark:bg-blue-900/20 border-l-4 border-blue-600' 
+                              : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                          }`}
+                        >
+                          <div className="relative flex-shrink-0">
+                            <img src={contact.avatar} alt={contact.name} className="w-12 h-12 rounded-full object-cover shadow-sm" />
+                            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-imessage-darkBg rounded-full"></div>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center space-x-1.5 truncate">
+                                <h3 className={`text-sm truncate ${conv.unread ? 'font-bold text-gray-900 dark:text-white' : 'font-semibold text-gray-800 dark:text-gray-200'}`}>
+                                  {contact.name}
+                                </h3>
+                                {conv.pinned && (
+                                  /* Custom Pin Icon representing the image attachment */
+                                  <i className="fa-solid fa-thumbtack text-blue-500 text-xs transform rotate-45" title="Discussion épinglée"></i>
+                                )}
+                              </div>
+                              <span className="text-[11px] text-gray-400 font-medium">
+                                {lastMsg ? lastMsg.timestamp : ''}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <p className={`text-xs truncate ${conv.unread ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
+                                {conv.isTyping ? (
+                                  <span className="text-blue-500 italic font-medium flex items-center space-x-1">
+                                    <span>en train d'écrire</span>
+                                    <span className="animate-pulse">...</span>
+                                  </span>
+                                ) : (
+                                  lastMsg ? (lastMsg.sender === 'user' ? `Vous : ${lastMsg.text}` : lastMsg.text) : 'Nouvelle conversation'
+                                )}
+                              </p>
+
+                              {/* Unread badge & Action pin button */}
+                              <div className="flex items-center space-x-1.5 ml-2">
+                                {conv.unread > 0 && (
+                                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center">
+                                    {conv.unread}
+                                  </span>
+                                )}
+
+                                <button 
+                                  onClick={(e) => handleTogglePinChat(conv.id, e)}
+                                  className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-500 p-1 transition"
+                                  title={conv.pinned ? "Désépingler" : "Épingler"}
+                                >
+                                  <i className={`fa-solid fa-thumbtack ${conv.pinned ? 'text-blue-500' : ''} transform rotate-45`}></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Active Conversation Panel */}
+              <div className={`flex-1 flex flex-col h-full bg-white dark:bg-black relative ${!activeChatId ? 'hidden md:flex' : 'flex'}`}>
+                {activeConv && activeContact ? (
+                  <ChatRoom 
+                    conversation={activeConv}
+                    contact={activeContact}
+                    onBack={() => setActiveChatId(null)}
+                    onSendMessage={(text, type, media) => handleSendMessage(activeConv.id, text, type, media)}
+                    onPinMessage={(msg) => handlePinMessage(activeConv.id, msg)}
+                    onStartCall={(type) => setActiveCall({ type, contact: activeContact })}
+                  />
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-imessage-grayBg/50 dark:bg-imessage-darkBg/30">
+                    <div className="w-20 h-20 rounded-3xl bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center mb-4 shadow-sm">
+                      <i className="fa-solid fa-comments text-4xl"></i>
+                    </div>
+                    <h2 className="text-xl font-bold mb-2">Vos messages</h2>
+                    <p className="text-sm text-gray-500 max-w-sm mb-6">
+                      Sélectionnez une discussion existante ou lancez une nouvelle conversation sécurisée avec vos contacts.
+                    </p>
+                    <button 
+                      onClick={() => setActiveTab('contacts')}
+                      className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition"
+                    >
+                      Démarrer une discussion
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {}
+          {activeTab === 'status' && (
+            <StatusTab 
+              currentUser={currentUser} 
+              contacts={contacts} 
+            />
+          )}
+
+          {activeTab === 'contacts' && (
+            <ContactsTab 
+              contacts={contacts} 
+              permissionGranted={permissionGranted}
+              onRequestPermission={() => setShowPermissionModal(true)}
+              onAddManualContact={handleAddManualContact}
+              onStartChat={(contactId) => {
+                let conv = conversations.find(c => c.contactId === contactId);
+                if (!conv) {
+                  conv = {
+                    id: `conv_${contactId}`,
+                    contactId,
+                    pinned: false,
+                    unread: 0,
+                    pinnedMessage: null,
+                    messages: []
+                  };
+                  setConversations(prev => [conv, ...prev]);
+                }
+                setActiveChatId(conv.id);
+                setActiveTab('chats');
+              }}
+            />
+          )}
+
+          {activeTab === 'settings' && (
+            <SettingsTab 
+              currentUser={currentUser}
+              permissionGranted={permissionGranted}
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              onLogout={handleLogout}
+              onRequestPermission={() => setShowPermissionModal(true)}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // --- Chat Room Component ---
+    function ChatRoom({ conversation, contact, onBack, onSendMessage, onPinMessage, onStartCall }) {
+      const [inputText, setInputText] = useState('');
+      const [isRecording, setIsRecording] = useState(false);
+      const [recordTimer, setRecordTimer] = useState(0);
+      const [showMediaModal, setShowMediaModal] = useState(false);
+      const messagesEndRef = useRef(null);
+      const mediaInputRef = useRef(null);
+      const timerRef = useRef(null);
+
+      const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      useEffect(() => {
+        scrollToBottom();
+      }, [conversation.messages, conversation.isTyping]);
+
+      // Handle voice message recording simulation
+      const startRecording = () => {
+        setIsRecording(true);
+        setRecordTimer(0);
+        timerRef.current = setInterval(() => {
+          setRecordTimer(prev => prev + 1);
+        }, 1000);
+      };
+
+      const stopAndSendRecording = () => {
+        clearInterval(timerRef.current);
+        setIsRecording(false);
+        const durationSec = recordTimer;
+        if (durationSec > 0) {
+          onSendMessage(`Message vocal (${durationSec}s)`, 'audio', null);
+        }
+        setRecordTimer(0);
+      };
+
+      const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            onSendMessage('Photo partagée', 'image', event.target.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      return (
+        <div className="flex-1 flex flex-col h-full bg-white dark:bg-black">
+          {/* Header */}
+          <div className="p-3.5 px-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between glass-effect bg-white/80 dark:bg-imessage-darkBg/80 z-10 sticky top-0">
+            <div className="flex items-center space-x-3">
+              <button onClick={onBack} className="md:hidden text-blue-600 pr-2 text-lg">
+                <i className="fa-solid fa-chevron-left"></i>
+              </button>
+
+              <div className="relative">
+                <img src={contact.avatar} alt={contact.name} className="w-10 h-10 rounded-full object-cover shadow-sm" />
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-black rounded-full"></div>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-sm leading-snug">{contact.name}</h3>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                  {conversation.isTyping ? 'en train d’écrire...' : 'En ligne'}
+                </p>
+              </div>
+            </div>
+
+            {/* Header Action Buttons */}
+            <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
+              <button 
+                onClick={() => onStartCall('audio')}
+                className="w-9 h-9 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition"
+                title="Appel audio"
+              >
+                <i className="fa-solid fa-phone"></i>
+              </button>
+
+              <button 
+                onClick={() => onStartCall('video')}
+                className="w-9 h-9 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition"
+                title="Appel vidéo"
+              >
+                <i className="fa-solid fa-video"></i>
+              </button>
+            </div>
+          </div>
+
+          {}
+          {conversation.pinnedMessage && (
+            <div className="bg-blue-50/90 dark:bg-blue-950/40 border-b border-blue-100 dark:border-blue-900/50 px-4 py-2 flex items-center justify-between text-xs text-blue-800 dark:text-blue-300">
+              <div className="flex items-center space-x-2 truncate">
+                <i className="fa-solid fa-thumbtack text-blue-600 transform rotate-45"></i>
+                <span className="font-semibold">Message épinglé:</span>
+                <span className="truncate italic">"{conversation.pinnedMessage}"</span>
+              </div>
+              <button 
+                onClick={() => onPinMessage({ text: conversation.pinnedMessage })} 
+                className="text-gray-400 hover:text-blue-600 ml-2"
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          )}
+
+          {/* Messages Container */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-gray-50/50 to-white dark:from-black dark:to-black">
+            {conversation.messages.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 space-y-2">
+                <i className="fa-solid fa-lock text-3xl opacity-30"></i>
+                <p className="text-xs max-w-xs">Les messages et les appels sont chiffrés de bout en bout. Personne en dehors de cette discussion ne peut les lire.</p>
+              </div>
+            ) : (
+              conversation.messages.map((msg) => {
+                const isUser = msg.sender === 'user';
+                return (
+                  <div 
+                    key={msg.id} 
+                    className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} group relative`}
+                  >
+                    <div className={`max-w-[75%] md:max-w-[65%] px-4 py-2.5 rounded-2xl relative shadow-sm ${
+                      isUser 
+                        ? 'bg-imessage-blue text-white rounded-br-sm' 
+                        : 'bg-imessage-bubbleGray dark:bg-imessage-bubbleDarkGray text-gray-900 dark:text-gray-100 rounded-bl-sm'
+                    }`}>
+                      {/* Media Image */}
+                      {msg.type === 'image' && msg.mediaUrl && (
+                        <img src={msg.mediaUrl} alt="Attachment" className="rounded-xl mb-1.5 max-h-60 w-full object-cover" />
+                      )}
+
+                      {/* Audio Message */}
+                      {msg.type === 'audio' ? (
+                        <div className="flex items-center space-x-3 py-1 min-w-[180px]">
+                          <button className={`w-8 h-8 rounded-full flex items-center justify-center ${isUser ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'}`}>
+                            <i className="fa-solid fa-play text-xs"></i>
+                          </button>
+                          <div className="flex-1 h-2 bg-gray-300 dark:bg-gray-600 rounded-full overflow-hidden">
+                            <div className="w-1/3 h-full bg-blue-500"></div>
+                          </div>
+                          <span className="text-[10px] font-mono opacity-80">{msg.text}</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                      )}
+
+                      {/* Timestamp & Status */}
+                      <div className={`flex items-center justify-end space-x-1 text-[10px] mt-1 ${isUser ? 'text-blue-100' : 'text-gray-400'}`}>
+                        <span>{msg.timestamp}</span>
+                        {isUser && (
+                          <i className="fa-solid fa-check-double text-[11px] text-blue-200"></i>
+                        )}
+                        {msg.pinned && (
+                          <i className="fa-solid fa-thumbtack text-[10px] ml-1 transform rotate-45"></i>
+                        )}
+                      </div>
+
+                      {/* Hover action menu for Pin message */}
+                      <button 
+                        onClick={() => onPinMessage(msg)}
+                        className={`absolute top-1/2 -translate-y-1/2 ${isUser ? '-left-8' : '-right-8'} opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-blue-500 transition`}
+                        title="Épingler le message"
+                      >
+                        <i className="fa-solid fa-thumbtack text-xs transform rotate-45"></i>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+
+            {conversation.isTyping && (
+              <div className="flex items-center space-x-2 text-gray-400 text-xs py-1">
+                <div className="bg-gray-200 dark:bg-gray-800 px-3 py-2 rounded-2xl flex items-center space-x-1">
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {}
+          <div className="p-3 bg-white dark:bg-imessage-darkBg border-t border-gray-200 dark:border-gray-800">
+            {isRecording ? (
+              <div className="flex items-center justify-between bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 px-4 py-2 rounded-full">
+                <div className="flex items-center space-x-3 text-red-600 dark:text-red-400">
+                  <span className="w-3 h-3 bg-red-600 rounded-full animate-ping"></span>
+                  <span className="font-mono text-xs font-bold">Enregistrement audio... {recordTimer}s</span>
+                </div>
+                <button 
+                  onClick={stopAndSendRecording}
+                  className="px-4 py-1 bg-red-600 text-white rounded-full text-xs font-semibold shadow hover:bg-red-700"
+                >
+                  Envoyer <i className="fa-solid fa-paper-plane ml-1"></i>
+                </button>
+              </div>
+            ) : (
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (inputText.trim()) {
+                    onSendMessage(inputText);
+                    setInputText('');
+                  }
+                }}
+                className="flex items-center space-x-2"
+              >
+                {/* Media Attachment Button */}
+                <input 
+                  type="file" 
+                  ref={mediaInputRef} 
+                  onChange={handleImageUpload} 
+                  accept="image/*" 
+                  className="hidden" 
+                />
+                <button 
+                  type="button"
+                  onClick={() => mediaInputRef.current?.click()}
+                  className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition flex items-center justify-center flex-shrink-0"
+                  title="Joindre une photo"
+                >
+                  <i className="fa-solid fa-paperclip"></i>
+                </button>
+
+                {/* Input Text Field */}
+                <input 
+                  type="text"
+                  placeholder="iMessage / Message..."
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  className="flex-1 bg-gray-100 dark:bg-gray-800 text-sm px-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 border-none placeholder-gray-400 dark:placeholder-gray-500"
+                />
+
+                {/* Voice Record / Send Button */}
+                {inputText.trim() ? (
+                  <button 
+                    type="submit"
+                    className="w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition shadow-md shadow-blue-500/30 flex-shrink-0"
+                    title="Envoyer"
+                  >
+                    <i className="fa-solid fa-arrow-up"></i>
+                  </button>
+                ) : (
+                  <button 
+                    type="button"
+                    onClick={startRecording}
+                    className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-red-500 hover:bg-red-50 transition flex items-center justify-center flex-shrink-0"
+                    title="Message vocal"
+                  >
+                    <i className="fa-solid fa-microphone"></i>
+                  </button>
+                )}
+              </form>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:Permission Modal Component ---
+    function PermissionModal({ onAccept, onDeny }) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 glass-effect animate-fade-in">
+          <div className="bg-white dark:bg-imessage-darkBg w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-gray-100 dark:border-gray-800 text-center flex flex-col items-center space-y-4">
+            
+            <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-3xl">
+              <i className="fa-solid fa-address-book"></i>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                Accès aux contacts requis
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                « TheMessages » demande la permission d'accéder à votre carnet d'adresses afin de synchroniser automatiquement vos amis inscrits sur l'application.
+              </p>
+            </div>
+
+            <div className="w-full pt-2 flex flex-col space-y-2">
+              <button 
+                onClick={onAccept}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-2xl shadow-lg shadow-blue-500/30 transition"
+              >
+                Autoriser la synchronisation
+              </button>
+
+              <button 
+                onClick={onDeny}
+                className="w-full py-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white font-medium text-xs transition"
+              >
+                Refuser
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:Audio/Video Call Overlay ---
+    function CallOverlay({ call, onEndCall }) {
+      const [callDuration, setCallDuration] = useState(0);
+
+      useEffect(() => {
+        const interval = setInterval(() => {
+          setCallDuration(prev => prev + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+      }, []);
+
+      const formatTime = (sec) => {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 bg-gray-900/95 text-white flex flex-col items-center justify-between p-8 glass-effect">
+          <div className="flex flex-col items-center space-y-3 mt-12">
+            <div className="relative">
+              <img src={call.contact.avatar} alt={call.contact.name} className="w-24 h-24 rounded-full object-cover border-4 border-blue-500 shadow-2xl pulse-ring" />
+            </div>
+            <h2 className="text-2xl font-bold">{call.contact.name}</h2>
+            <p className="text-sm text-blue-400 font-mono">{call.type === 'video' ? 'Appel Vidéo HD' : 'Appel Audio'} - {formatTime(callDuration)}</p>
+          </div>
+
+          {call.type === 'video' && (
+            <div className="w-full max-w-md h-64 bg-gray-800 rounded-3xl overflow-hidden relative flex items-center justify-center border border-gray-700 shadow-inner">
+              <i className="fa-solid fa-user-large text-6xl text-gray-600"></i>
+              <div className="absolute top-3 right-3 w-20 h-28 bg-gray-900 rounded-xl border border-gray-600 overflow-hidden shadow">
+                <div className="w-full h-full bg-gray-700 flex items-center justify-center text-xs text-gray-400">Vous</div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center space-x-6 mb-12">
+            <button className="w-14 h-14 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-700 transition">
+              <i className="fa-solid fa-microphone-slash text-xl"></i>
+            </button>
+            <button 
+              onClick={onEndCall}
+              className="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition shadow-lg shadow-red-600/40"
+            >
+              <i className="fa-solid fa-phone-slash text-2xl"></i>
+            </button>
+            <button className="w-14 h-14 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-700 transition">
+              <i className="fa-solid fa-volume-high text-xl"></i>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:Contacts Tab Component ---
+    function ContactsTab({ contacts, permissionGranted, onRequestPermission, onAddManualContact, onStartChat }) {
+      const [showAddModal, setShowAddModal] = useState(false);
+      const [nameInput, setNameInput] = useState('');
+      const [phoneInput, setPhoneInput] = useState('');
+
+      return (
+        <div className="flex-1 bg-white dark:bg-imessage-darkBg h-full flex flex-col overflow-hidden">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">Carnet de contacts</h1>
+              <p className="text-xs text-gray-500">Gérez vos amis et démarrez des discussions</p>
+            </div>
+
+            <button 
+              onClick={() => setShowAddModal(true)}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center space-x-2"
+            >
+              <i className="fa-solid fa-plus"></i>
+              <span>Ajouter un contact</span>
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6">
+            {!permissionGranted && (
+              <div className="p-6 bg-blue-50 dark:bg-blue-950/30 rounded-3xl border border-blue-200 dark:border-blue-900 mb-6 flex flex-col items-center text-center space-y-3">
+                <i className="fa-solid fa-address-book text-4xl text-blue-600"></i>
+                <h3 className="font-bold text-base">Synchroniser votre répertoire</h3>
+                <p className="text-xs text-gray-600 dark:text-gray-300 max-w-md">
+                  Pour retrouver automatiquement Claudette, Bernard et vos autres amis inscrits, vous devez autoriser l'accès aux contacts.
+                </p>
+                <button 
+                  onClick={onRequestPermission}
+                  className="px-5 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition"
+                >
+                  Demander l'accès aux contacts
+                </button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {contacts.length === 0 ? (
+                <div className="col-span-full py-12 text-center text-gray-400">
+                  <p className="text-sm">Aucun contact disponible pour le moment.</p>
+                </div>
+              ) : (
+                contacts.map(c => (
+                  <div key={c.id} className="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center justify-between hover:shadow-md transition">
+                    <div className="flex items-center space-x-3">
+                      <img src={c.avatar} alt={c.name} className="w-12 h-12 rounded-full object-cover" />
+                      <div>
+                        <h4 className="font-bold text-sm">{c.name}</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{c.phone}</p>
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={() => onStartChat(c.id)}
+                      className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition"
+                      title="Envoyer un message"
+                    >
+                      <i className="fa-solid fa-comment"></i>
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Add Manual Contact Modal */}
+          {showAddModal && (
+            <div className="fixed inset-0 bg-black/50 glass-effect flex items-center justify-center p-4 z-50">
+              <div className="bg-white dark:bg-imessage-darkBg w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl border border-gray-200 dark:border-gray-800">
+                <h3 className="text-lg font-bold">Nouveau contact</h3>
+                <div className="space-y-3">
+                  <input 
+                    type="text" 
+                    placeholder="Nom complet" 
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 border-none text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Numéro de téléphone" 
+                    value={phoneInput}
+                    onChange={(e) => setPhoneInput(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 border-none text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex justify-end space-x-3 pt-2">
+                  <button 
+                    onClick={() => setShowAddModal(false)}
+                    className="px-4 py-2 text-xs font-semibold text-gray-500"
+                  >
+                    Annuler
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (nameInput && phoneInput) {
+                        onAddManualContact(nameInput, phoneInput);
+                        setNameInput('');
+                        setPhoneInput('');
+                        setShowAddModal(false);
+                      }
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold"
+                  >
+                    Ajouter
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:WhatsApp Status / Stories Tab ---
+    function StatusTab({ currentUser, contacts }) {
+      const mockStories = [
+        { id: 's1', name: 'Claudette', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', time: 'Aujourd’hui à 11:20', image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600' },
+        { id: 's2', name: 'Bernard', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', time: 'Hier à 19:45', image: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600' }
+      ];
+
+      const [selectedStory, setSelectedStory] = useState(null);
+
+      return (
+        <div className="flex-1 bg-white dark:bg-imessage-darkBg h-full flex flex-col p-6 overflow-y-auto">
+          <h1 className="text-2xl font-bold mb-1">Statuts WhatsApp</h1>
+          <p className="text-xs text-gray-500 mb-6">Mises à jour éphémères visibles 24 heures</p>
+
+          {/* User Status */}
+          <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl mb-6">
+            <div className="relative">
+              <img src={currentUser.avatar} alt="Me" className="w-14 h-14 rounded-full object-cover border-2 border-blue-500" />
+              <div className="absolute bottom-0 right-0 w-5 h-5 bg-blue-600 rounded-full text-white text-xs flex items-center justify-center border-2 border-white dark:border-black">
+                +
+              </div>
+            </div>
+            <div>
+              <h3 className="font-bold text-sm">Mon statut</h3>
+              <p className="text-xs text-gray-400">Appuyez pour ajouter une mise à jour</p>
+            </div>
+          </div>
+
+          {/* Contact Statuses */}
+          <h2 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Mises à jour récentes</h2>
+          <div className="space-y-3">
+            {mockStories.map(story => (
+              <div 
+                key={story.id} 
+                onClick={() => setSelectedStory(story)}
+                className="flex items-center space-x-4 p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-2xl cursor-pointer transition"
+              >
+                <div className="p-0.5 rounded-full bg-gradient-to-tr from-green-500 to-blue-500">
+                  <img src={story.avatar} alt={story.name} className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-black" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm">{story.name}</h4>
+                  <p className="text-xs text-gray-400">{story.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Story Viewer Modal */}
+          {selectedStory && (
+            <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-between p-6">
+              <div className="w-full max-w-md space-y-3">
+                <div className="w-full h-1 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-full bg-white animate-pulse"></div>
+                </div>
+                <div className="flex items-center justify-between text-white">
+                  <div className="flex items-center space-x-3">
+                    <img src={selectedStory.avatar} className="w-9 h-9 rounded-full" />
+                    <div>
+                      <p className="font-bold text-xs">{selectedStory.name}</p>
+                      <p className="text-[10px] text-gray-400">{selectedStory.time}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setSelectedStory(null)} className="text-white text-xl">
+                    <i className="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div className="w-full max-w-md h-[70vh] rounded-3xl overflow-hidden shadow-2xl relative my-auto">
+                <img src={selectedStory.image} className="w-full h-full object-cover" />
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:Settings Tab Component ---
+    function SettingsTab({ currentUser, permissionGranted, darkMode, setDarkMode, onLogout, onRequestPermission }) {
+      return (
+        <div className="flex-1 bg-white dark:bg-imessage-darkBg h-full flex flex-col p-6 overflow-y-auto">
+          <h1 className="text-2xl font-bold mb-6">Réglages</h1>
+
+          <div className="max-w-xl space-y-6">
+            {/* User Info */}
+            <div className="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-3xl flex items-center space-x-4 border border-gray-100 dark:border-gray-800">
+              <img src={currentUser.avatar} alt={currentUser.name} className="w-16 h-16 rounded-full object-cover border-2 border-blue-500" />
+              <div>
+                <h3 className="font-bold text-base">{currentUser.name}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser.email || currentUser.phone}</p>
+                <span className="inline-block mt-1 px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-full">
+                  Compte actif
+                </span>
+              </div>
+            </div>
+
+            {/* Settings Options */}
+            <div className="space-y-3">
+              <div className="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <i className="fa-solid fa-moon text-blue-500 text-lg"></i>
+                  <div>
+                    <p className="font-semibold text-sm">Mode Sombre</p>
+                    <p className="text-xs text-gray-400">Adapter l'interface au thème sombre</p>
+                  </div>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={darkMode} 
+                  onChange={(e) => setDarkMode(e.target.checked)}
+                  className="w-5 h-5 accent-blue-600 rounded cursor-pointer" 
+                />
+              </div>
+
+              <div className="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <i className="fa-solid fa-shield-halved text-emerald-500 text-lg"></i>
+                  <div>
+                    <p className="font-semibold text-sm">Permission Contacts</p>
+                    <p className="text-xs text-gray-400">
+                      {permissionGranted ? 'Accès aux contacts autorisé' : 'Accès refusé ou non configuré'}
+                    </p>
+                  </div>
+                </div>
+                {!permissionGranted && (
+                  <button 
+                    onClick={onRequestPermission} 
+                    className="px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold"
+                  >
+                    Autoriser
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Logout Button */}
+            <div className="pt-4">
+              <button 
+                onClick={onLogout}
+                className="w-full py-3 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-bold rounded-2xl border border-red-200 dark:border-red-900/50 hover:bg-red-100 transition"
+              >
+                Se déconnecter
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // --- STREAMING_CHUNK:Auth Screen Component (Login & Sign Up) ---
+    function AuthScreen({ onLogin, darkMode, setDarkMode }) {
+      const [isSignUp, setIsSignUp] = useState(false);
+      const [name, setName] = useState('');
+      const [emailOrPhone, setEmailOrPhone] = useState('');
+      const [password, setPassword] = useState('');
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!emailOrPhone) return;
+
+        const userObj = {
+          id: 'u_' + Date.now(),
+          name: name || (isSignUp ? 'Nouvel Utilisateur' : emailOrPhone.split('@')[0]),
+          phone: emailOrPhone.includes('@') ? '+33 6 00 00 00 00' : emailOrPhone,
+          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name || emailOrPhone)}`
+        };
+
+        // Pass flag if new user account created
+        onLogin(userObj, isSignUp);
+      };
+
+      return (
+        <div className="min-h-screen w-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-700 flex items-center justify-center p-4">
+          <div className="bg-white/90 dark:bg-imessage-darkBg/90 backdrop-blur-2xl w-full max-w-md rounded-3xl p-8 shadow-2xl border border-white/20 dark:border-gray-800 text-gray-900 dark:text-white space-y-6">
+            
+            {/* Header */}
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-lg shadow-blue-500/40 mb-3">
+                <i className="fa-solid fa-comment-dots"></i>
+              </div>
+              <h1 className="text-2xl font-black tracking-tight">TheMessages</h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {isSignUp ? 'Créer votre compte pour commencer à discuter' : 'Connexion requise pour accéder à vos discussions'}
+              </p>
+            </div>
+
+            {/* Auth Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {isSignUp && (
+                <div>
+                  <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-300">Nom complet</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="ex: Jean Dupont" 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 border-none text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-300">Email ou Numéro de téléphone</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="jean@example.com ou +33 6..." 
+                  value={emailOrPhone}
+                  onChange={(e) => setEmailOrPhone(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 border-none text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-gray-600 dark:text-gray-300">Mot de passe</label>
+                <input 
+                  type="password" 
+                  required
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 border-none text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <button 
+                type="submit"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-500/30 transition mt-2"
+              >
+                {isSignUp ? 'Créer mon compte' : 'Se connecter'}
+              </button>
+            </form>
+
+            {/* Switch Mode */}
+            <div className="text-center text-xs text-gray-500 pt-2 border-t border-gray-100 dark:border-gray-800">
+              {isSignUp ? (
+                <p>
+                  Vous avez déjà un compte ?{' '}
+                  <button onClick={() => setIsSignUp(false)} className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                    Se connecter
+                  </button>
+                </p>
+              ) : (
+                <p>
+                  Pas encore de compte ?{' '}
+                  <button onClick={() => setIsSignUp(true)} className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                    Créer un compte
+                  </button>
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
 </body>
 </html>
