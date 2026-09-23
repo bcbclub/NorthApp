@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<title>The NorthApp</title>
+<style>
+:root{
+  --bg:#f4f5f7;--surface:#fff;--surface2:#eef0f3;--text:#111318;--muted:#707680;
+  --line:#e1e3e7;--accent:#111318;--accentText:#fff;--blue:#087df0;
+  --radius:22px;--shadow:0 16px 50px rgba(0,0,0,.08);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text)}
+button,input{font:inherit}
+button{border:0;cursor:pointer}
+.app{height:100dvh;display:grid;grid-template-columns:300px 1fr;overflow:hidden}
+.sidebar{background:#0b0d12;color:#fff;padding:24px 16px;display:flex;flex-direction:column;gap:20px}
+.brand{font-size:25px;font-weight:800;letter-spacing:-1px;padding:5px 10px 15px}
+.brand span{font-weight:400}
+.search{height:44px;border-radius:14px;background:#1a1d24;color:#fff;border:1px solid #282c34;padding:0 14px;outline:0;width:100%}
+.search::placeholder{color:#9297a1}
+.nav{display:grid;gap:6px}
+.nav button{height:48px;border-radius:13px;background:transparent;color:#aeb3bd;text-align:left;padding:0 13px;font-weight:600}
+.nav button.active,.nav button:hover{background:#20232a;color:#fff}
+.section-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#777d87;padding:10px 10px 4px}
+.chat-list{display:grid;gap:4px;overflow:auto}
+.chat{display:grid;grid-template-columns:43px 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:14px;color:#fff;background:transparent;text-align:left}
+.chat:hover,.chat.active{background:#20232a}
+.avatar{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:#d8dbe1;color:#111;font-weight:700}
+.chat-main{min-width:0}.chat-name{font-weight:700;font-size:14px}.chat-last{font-size:12px;color:#8f95a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.chat-time{font-size:10px;color:#7e848e}
+.profile{margin-top:auto;border-top:1px solid #242830;padding-top:16px;display:flex;align-items:center;gap:10px}
+.profile .avatar{background:#fff}
+.profile-info{min-width:0}.profile-name{font-weight:700}.profile-status{font-size:12px;color:#9297a1}
+
+.main{min-width:0;background:var(--surface);display:grid;grid-template-rows:76px 1fr auto}
+.topbar{border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+.contact{display:flex;align-items:center;gap:12px}.contact .avatar{width:44px;height:44px}
+.contact-name{font-weight:800;font-size:17px}.contact-state{font-size:12px;color:#7b818b;margin-top:2px}
+.actions{display:flex;gap:8px}.action{width:42px;height:42px;border-radius:13px;background:var(--surface2);color:var(--text);font-size:17px}.action:hover{background:#e4e6ea}
+.messages{overflow:auto;padding:28px clamp(18px,5vw,70px);display:flex;flex-direction:column;gap:9px}
+.day{text-align:center;color:#8a9099;font-size:11px;margin:4px 0 12px}
+.row{display:flex}.row.me{justify-content:flex-end}.bubble{max-width:min(68%,620px);padding:12px 16px;border-radius:19px;background:#eef0f3;line-height:1.38;font-size:15px}.me .bubble{background:#111318;color:#fff}.meta{font-size:10px;color:#90959d;margin:4px 9px}.me .meta{text-align:right}
+.composer{padding:13px 24px 18px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:end}
+.add{width:45px;height:45px;border-radius:14px;background:var(--surface2);font-size:25px}
+.input-wrap{flex:1;display:flex;align-items:end;border:1px solid var(--line);border-radius:17px;padding:5px 6px 5px 14px;background:#fff}
+#input{flex:1;border:0;outline:0;resize:none;min-height:34px;max-height:120px;padding:7px 0;font-size:15px}
+.send{width:38px;height:38px;border-radius:12px;background:var(--blue);color:#fff;font-size:17px}
+.send:disabled{opacity:.35;cursor:default}
+
+.empty{display:none}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:#111318;color:#fff;padding:10px 15px;border-radius:13px;font-size:13px;opacity:0;pointer-events:none;transition:.2s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:800px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .topbar{padding:0 15px}
+  .messages{padding:20px 14px}
+  .bubble{max-width:82%}
+  .composer{padding:10px 12px max(12px,env(safe-area-inset-bottom))}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">The <span>North</span>App</div>
+    <input class="search" id="search" placeholder="Rechercher">
+    <div class="nav">
+      <button class="active" data-view="messages">Messages</button>
+      <button data-view="groups">Groupes</button>
+      <button data-view="contacts">Contacts</button>
+    </div>
+    <div class="section-title">Conversations</div>
+    <div class="chat-list" id="chatList">
+      <button class="chat active" data-name="Alex Morgan" data-status="En ligne">
+        <span class="avatar">AM</span><span class="chat-main"><span class="chat-name">Alex Morgan</span><span class="chat-last">On se retrouve ce soir ?</span></span><span class="chat-time">11:42</span>
+      </button>
+      <button class="chat" data-name="North Team" data-status="8 membres">
+        <span class="avatar">N</span><span class="chat-main"><span class="chat-name">North Team</span><span class="chat-last">Camille : nouveau document</span></span><span class="chat-time">10:18</span>
+      </button>
+      <button class="chat" data-name="Emma" data-status="Hors ligne">
+        <span class="avatar">E</span><span class="chat-main"><span class="chat-name">Emma</span><span class="chat-last">Merci !</span></span><span class="chat-time">Hier</span>
+      </button>
+    </div>
+    <div class="profile">
+      <span class="avatar">M</span><span class="profile-info"><span class="profile-name">Mon profil</span><span class="profile-status">Disponible</span></span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="contact">
+        <span class="avatar" id="contactAvatar">AM</span>
+        <div><div class="contact-name" id="contactName">Alex Morgan</div><div class="contact-state" id="contactState">En ligne</div></div>
+      </div>
+      <div class="actions">
+        <button class="action" id="call" title="Appel">⌕</button>
+        <button class="action" id="video" title="Vidéo">▣</button>
+        <button class="action" id="more" title="Plus">•••</button>
+      </div>
+    </header>
+
+    <section class="messages" id="messages">
+      <div class="day">Aujourd’hui</div>
+      <div class="row"><div><div class="bubble">Salut ! Tu as reçu le nouveau dossier ?</div><div class="meta">11:38</div></div></div>
+      <div class="row me"><div><div class="bubble">Oui, je viens de le regarder.</div><div class="meta">11:40 · Distribué</div></div></div>
+      <div class="row"><div><div class="bubble">Parfait. On se retrouve ce soir ?</div><div class="meta">11:42</div></div></div>
+    </section>
+
+    <form class="composer" id="composer">
+      <button class="add" type="button" id="add">+</button>
+      <div class="input-wrap">
+        <textarea id="input" rows="1" placeholder="Écrire un message…"></textarea>
+        <button class="send" id="send" type="submit" disabled>↑</button>
+      </div>
+    </form>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const input=document.getElementById('input'), send=document.getElementById('send'), messages=document.getElementById('messages');
+const toast=document.getElementById('toast');
+
+function resize(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,120)+'px';send.disabled=!input.value.trim();}
+input.addEventListener('input',resize);
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('composer').requestSubmit();}});
+document.getElementById('composer').addEventListener('submit',e=>{
+  e.preventDefault(); const text=input.value.trim(); if(!text)return;
+  const row=document.createElement('div'); row.className='row me';
+  row.innerHTML='<div><div class="bubble"></div><div class="meta">À l’instant · Distribué</div></div>';
+  row.querySelector('.bubble').textContent=text; messages.appendChild(row);
+  input.value='';resize();messages.scrollTop=messages.scrollHeight;
+});
+document.querySelectorAll('.chat').forEach(chat=>chat.addEventListener('click',()=>{
+  document.querySelectorAll('.chat').forEach(c=>c.classList.remove('active'));chat.classList.add('active');
+  document.getElementById('contactName').textContent=chat.dataset.name;
+  document.getElementById('contactState').textContent=chat.dataset.status;
+  document.getElementById('contactAvatar').textContent=chat.dataset.name.split(' ').map(x=>x[0]).join('').slice(0,2);
+}));
+document.getElementById('search').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
+  document.querySelectorAll('.chat').forEach(c=>c.style.display=c.innerText.toLowerCase().includes(q)?'grid':'none');
+});
+function notice(t){toast.textContent=t;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1800)}
+document.getElementById('add').onclick=()=>notice('Pièces jointes — prochaine version');
+document.getElementById('call').onclick=()=>notice('Appel audio — prochaine version');
+document.getElementById('video').onclick=()=>notice('Appel vidéo — prochaine version');
+document.getElementById('more').onclick=()=>notice('Options de conversation');
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');notice(b.textContent+' — bêta 1')});
+</script>
+</body>
+</html>
